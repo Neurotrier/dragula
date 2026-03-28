@@ -1,4 +1,6 @@
-# Dragula
+<img src="https://raw.githubusercontent.com/Neurotrier/dragula/dev/docs/dragula.png" width="228" />
+
+## Description
 
 `Dragula` (D-RAG-ula) is a Python library that indexes a Python codebase and serves a local web UI for AI-generated object documentation over pluggable LLM providers.
 
