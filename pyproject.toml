@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools==68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dragula"
+version = "0.0.1"
+authors = [{ name = "Matvey Bliznyuk" }]
+description = "AI-powered codebase indexing and documentation generator."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+  "chromadb>=0.5.0",
+  "fastapi>=0.115.0",
+  "google-genai>=0.8.0",
+  "jinja2>=3.1.0",
+  "pydantic>=2.8.0",
+  "rich>=13.7.0",
+  "uvicorn>=0.30.0",
+]
+classifiers = [
+  "Operating System :: OS Independent",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Documentation",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Environment :: Web Environment",
+  "Framework :: FastAPI",
+]
+keywords = [
+  "documentation",
+  "rag",
+  "autogeneration",
+  "codebase",
+  "indexing",
+  "fastapi",
+  "llm",
+  "ai"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2.0",
+  "build>=1.2.0",
+  "twine>=5.0.0",
+]
+
+[project.scripts]
+dragula = "dragula.adapters.inbound.cli:main"
+
+[project.urls]
+Source = "https://github.com/Neurotrier/dragula"
+Tracker = "https://github.com/Neurotrier/dragula/issues"
+
+[tool.setuptools]
+license-files = ["LICENSE"]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"dragula.adapters.inbound.web" = ["templates/*.html", "static/*.css", "static/*.js"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
