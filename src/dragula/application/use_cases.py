@@ -1,7 +1,7 @@
 import hashlib
 from dataclasses import dataclass
 
-from dragula.application.code_processing import build_chunks, parse_file_symbols
+from dragula.application.parsing import build_chunks, parse_file_symbols
 from dragula.application.ports import (
     ChatClientPort,
     DescriptionCachePort,
@@ -111,12 +111,6 @@ class IndexProjectUseCase:
                 message = (
                     f"{project_file.relative_path}: {exc.__class__.__name__}: {exc}"
                 )
-                if "429" in str(exc) or "insufficient_quota" in str(exc):
-                    message += " | Check provider quota/billing."
-                if "404" in str(exc) or "model" in str(exc).lower():
-                    message += " | Check [embedding].model in .dragula/config.ini."
-                if "401" in str(exc) or "unauthorized" in str(exc).lower():
-                    message += " | Check provider auth settings in [embedding]."
                 errors.append(message)
 
         self.symbol_writer.finish_index_run(

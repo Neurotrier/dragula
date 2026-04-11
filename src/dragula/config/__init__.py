@@ -1,4 +1,5 @@
 from dragula.config.settings import (
+    ALLOWED_PROVIDERS,
     DRAGULA_DIR,
     INIT_CONFIG_INI_TEMPLATE,
     ProviderSettings,
@@ -8,6 +9,7 @@ from dragula.config.settings import (
 )
 
 __all__ = [
+    "ALLOWED_PROVIDERS",
     "DRAGULA_DIR",
     "INIT_CONFIG_INI_TEMPLATE",
     "ProviderSettings",
