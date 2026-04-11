@@ -5,10 +5,7 @@ import uvicorn
 from rich.console import Console
 
 from dragula.adapters.inbound.web.app import create_app
-from dragula.adapters.outbound.chroma_vector_index import ChromaVectorIndexAdapter
-from dragula.adapters.outbound.sqlite_repository import SQLiteCodeDocumentRepository
-from dragula.composition import build_application
-from dragula.config import INIT_CONFIG_INI_TEMPLATE, dragula_dir_for, load_settings
+from dragula.composition import build_application, initialize_project
 
 console = Console()
 
@@ -31,26 +28,20 @@ def _print_provider_help(exc: Exception) -> None:
 
 def cmd_init(args: argparse.Namespace) -> int:
     root = Path(args.path).resolve()
-    dragula_dir = dragula_dir_for(root)
-    if dragula_dir.exists():
+    try:
+        settings = initialize_project(root)
+    except FileExistsError:
+        dragula_dir = root / ".dragula"
         console.print(
             f"[red]Already initialized:[/red] {dragula_dir} exists. Remove it to re-run [bold]dragula init[/bold]."
         )
         return 1
-    dragula_dir.mkdir(parents=False)
-    config_path = dragula_dir / "config.ini"
-    config_path.write_text(INIT_CONFIG_INI_TEMPLATE, encoding="utf-8")
-    try:
-        settings = load_settings(root)
     except Exception as exc:
         console.print(
-            f"[red]Init failed after writing config:[/red] {exc.__class__.__name__}: {exc}"
+            f"[red]Init failed:[/red] {exc.__class__.__name__}: {exc}"
         )
         return 1
-    repository = SQLiteCodeDocumentRepository(settings.sqlite_path)
-    repository.close()
-    ChromaVectorIndexAdapter(settings.chroma_dir)
-    console.print(f"Initialized dragula data at [green]{dragula_dir}[/green]")
+    console.print(f"Initialized dragula data at [green]{settings.dragula_dir}[/green]")
     return 0
 
 
