@@ -3,29 +3,24 @@ from pathlib import Path
 import pytest
 
 from dragula.config import load_settings
-
-
-def _write_config(path: Path, text: str) -> None:
-    path.write_text(text, encoding="utf-8")
+from tests.support import create_project, write_config
 
 
 def test_load_settings_reads_config_ini(tmp_path: Path) -> None:
-    project = tmp_path / "proj"
-    project.mkdir()
+    project = create_project(tmp_path)
     dragula = project / ".dragula"
-    dragula.mkdir()
-    _write_config(
-        dragula / "config.ini",
+    write_config(
+        project,
         "[app]\n"
         "top_k = 8\n"
         "\n"
         "[chat]\n"
-        "provider = openai_compatible\n"
+        "provider = openai\n"
         "model = model-chat\n"
         "base_url = http://chat.local/v1\n"
         "\n"
         "[embedding]\n"
-        "provider = openai_compatible\n"
+        "provider = openai\n"
         "model = model-embed\n"
         "base_url = http://localhost:11434/v1\n",
     )
@@ -33,9 +28,9 @@ def test_load_settings_reads_config_ini(tmp_path: Path) -> None:
     settings = load_settings(project)
 
     assert settings.top_k == 8
-    assert settings.chat.provider == "openai_compatible"
+    assert settings.chat.provider == "openai"
     assert settings.chat.model == "model-chat"
-    assert settings.embedding.provider == "openai_compatible"
+    assert settings.embedding.provider == "openai"
     assert settings.embedding.model == "model-embed"
     assert settings.dragula_dir == dragula
     assert settings.config_path == dragula / "config.ini"
@@ -48,13 +43,10 @@ def test_load_settings_reads_config_ini(tmp_path: Path) -> None:
 def test_load_settings_resolves_provider_env_vars(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    project = tmp_path / "proj"
-    project.mkdir()
-    dragula = project / ".dragula"
-    dragula.mkdir()
+    project = create_project(tmp_path)
     monkeypatch.setenv("TEST_PROVIDER_KEY", "secret-value")
-    _write_config(
-        dragula / "config.ini",
+    write_config(
+        project,
         "[app]\n"
         "top_k = 6\n"
         "\n"
@@ -76,7 +68,6 @@ def test_load_settings_resolves_provider_env_vars(
 
 
 def test_load_settings_requires_config_file(tmp_path: Path) -> None:
-    project = tmp_path / "proj"
-    project.mkdir()
+    project = create_project(tmp_path)
     with pytest.raises(FileNotFoundError):
         load_settings(project)

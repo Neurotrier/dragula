@@ -4,9 +4,10 @@ from concurrent.futures import ThreadPoolExecutor
 from fastapi.testclient import TestClient
 
 from dragula.adapters.inbound.web.app import create_app
-from dragula.adapters.outbound.sqlite_repository import SQLiteCodeDocumentRepository
+from dragula.adapters.outbound.storage.sqlite import SQLiteCodeDocumentRepository
 from dragula.config import load_settings
 from dragula.domain import ParsedSymbol
+from tests.support import create_project, write_default_test_config
 
 
 class FakeGenerator:
@@ -23,31 +24,9 @@ class FakeGenerator:
             "references": ["sample.mod.run_service"],
         }
 
-
-def _write_test_config(project: Path) -> None:
-    dragula = project / ".dragula"
-    dragula.mkdir(parents=True)
-    (dragula / "config.ini").write_text(
-        "[app]\n"
-        "top_k = 6\n"
-        "\n"
-        "[chat]\n"
-        "provider = gemini\n"
-        "model = gemini-1.5-flash\n"
-        "api_key = test-key\n"
-        "\n"
-        "[embedding]\n"
-        "provider = gemini\n"
-        "model = gemini-embedding-001\n"
-        "api_key = test-key\n",
-        encoding="utf-8",
-    )
-
-
 def test_web_api_lists_symbols(tmp_path: Path) -> None:
-    project = tmp_path / "proj"
-    project.mkdir()
-    _write_test_config(project)
+    project = create_project(tmp_path)
+    write_default_test_config(project)
     settings = load_settings(project)
     sqlite_store = SQLiteCodeDocumentRepository(settings.sqlite_path)
     sqlite_store.replace_symbols_for_file(
@@ -89,9 +68,8 @@ def test_web_api_lists_symbols(tmp_path: Path) -> None:
 
 
 def test_web_api_lists_symbols_concurrently(tmp_path: Path) -> None:
-    project = tmp_path / "proj"
-    project.mkdir()
-    _write_test_config(project)
+    project = create_project(tmp_path)
+    write_default_test_config(project)
     settings = load_settings(project)
     sqlite_store = SQLiteCodeDocumentRepository(settings.sqlite_path)
     sqlite_store.replace_symbols_for_file(
@@ -133,9 +111,8 @@ def test_web_api_lists_symbols_concurrently(tmp_path: Path) -> None:
 
 
 def test_web_api_deletes_ai_descriptions_by_symbol_id(tmp_path: Path) -> None:
-    project = tmp_path / "proj"
-    project.mkdir()
-    _write_test_config(project)
+    project = create_project(tmp_path)
+    write_default_test_config(project)
     settings = load_settings(project)
     sqlite_store = SQLiteCodeDocumentRepository(settings.sqlite_path)
     sqlite_store.replace_symbols_for_file(
@@ -185,9 +162,8 @@ def test_web_api_deletes_ai_descriptions_by_symbol_id(tmp_path: Path) -> None:
 def test_web_api_delete_descriptions_returns_404_for_missing_symbol(
     tmp_path: Path,
 ) -> None:
-    project = tmp_path / "proj"
-    project.mkdir()
-    _write_test_config(project)
+    project = create_project(tmp_path)
+    write_default_test_config(project)
     settings = load_settings(project)
     sqlite_store = SQLiteCodeDocumentRepository(settings.sqlite_path)
     app = create_app(

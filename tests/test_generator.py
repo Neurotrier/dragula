@@ -1,7 +1,7 @@
 import hashlib
 from pathlib import Path
 
-from dragula.adapters.outbound.sqlite_repository import SQLiteCodeDocumentRepository
+from dragula.adapters.outbound.storage.sqlite import SQLiteCodeDocumentRepository
 from dragula.application.use_cases import DescribeSymbolUseCase
 from dragula.domain import GeneratedDescription, ParsedSymbol
 

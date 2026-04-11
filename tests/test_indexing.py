@@ -1,8 +1,8 @@
 import sqlite3
 from pathlib import Path
 
-from dragula.adapters.outbound.filesystem_source import LocalProjectFileSource
-from dragula.adapters.outbound.sqlite_repository import SQLiteCodeDocumentRepository
+from dragula.adapters.outbound.filesystem import LocalProjectFileSource
+from dragula.adapters.outbound.storage.sqlite import SQLiteCodeDocumentRepository
 from dragula.application.use_cases import IndexProjectUseCase
 from dragula.domain import Chunk
 
