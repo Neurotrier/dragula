@@ -16,7 +16,7 @@ class OpenAICompatibleConfig:
 
 
 class OpenAICompatibleClient:
-    provider_name = "openai_compatible"
+    provider_name = "openai"
 
     def __init__(self, config: OpenAICompatibleConfig) -> None:
         if not config.base_url:
