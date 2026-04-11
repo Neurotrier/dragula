@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 DRAGULA_DIR = ".dragula"
+ALLOWED_PROVIDERS = ("openai", "gemini", "custom")
 
 INIT_CONFIG_INI_TEMPLATE = """[app]
 top_k = 6
@@ -15,6 +16,11 @@ model = gemini-2.5-flash
 api_key = ${GEMINI_API_KEY}
 base_url =
 timeout_seconds = 60
+# Custom provider:
+# provider = custom
+# model = custom-chat-model
+# class_path = C:/absolute/path/to/custom_chat_provider.py
+# class_name = CustomChatProvider
 
 [embedding]
 provider = gemini
@@ -22,6 +28,11 @@ model = gemini-embedding-001
 api_key = ${GEMINI_API_KEY}
 base_url =
 timeout_seconds = 60
+# Custom provider:
+# provider = custom
+# model = custom-embedding-model
+# class_path = C:/absolute/path/to/custom_embedding_provider.py
+# class_name = CustomEmbeddingProvider
 """
 
 
