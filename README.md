@@ -67,11 +67,36 @@ base_url =
 timeout_seconds = 60
 
 [embedding]
-provider = openai_compatible
+provider = openai
 model = text-embedding-3-small
 base_url = http://localhost:11434/v1
 api_key =
 timeout_seconds = 60
+```
+
+### Custom providers
+
+For `provider = custom`, Dragula loads a class from an absolute Python file path and
+instantiates it as `CustomProvider(provider_settings)`.
+
+- A custom chat provider must expose `provider_name`, `chat_model`, and `generate_description(...)`.
+- A custom embedding provider must expose `provider_name`, `embedding_model`, and `embed_texts(...)`.
+
+```ini
+[app]
+top_k = 6
+
+[chat]
+provider = custom
+model = custom-chat-model
+class_path = C:/absolute/path/to/custom_chat_provider.py
+class_name = CustomChatProvider
+
+[embedding]
+provider = custom
+model = custom-embedding-model
+class_path = C:/absolute/path/to/custom_embedding_provider.py
+class_name = CustomEmbeddingProvider
 ```
 
 ## Usage
