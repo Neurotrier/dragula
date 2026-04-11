@@ -1,4 +1,4 @@
-import time
+import logging
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
 
@@ -8,17 +8,20 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
-from dragula.adapters.outbound.sqlite_repository import SQLiteCodeDocumentRepository
-from dragula.adapters.outbound.chroma_vector_index import ChromaVectorIndexAdapter
-from dragula.adapters.outbound.llm_factory import build_llm_provider
+from dragula.adapters.outbound.storage.sqlite import SQLiteCodeDocumentRepository
 from dragula.application.use_cases import (
     DeleteSymbolDescriptionsUseCase,
     DescribeSymbolUseCase,
     GetSymbolDetailsUseCase,
     ListSymbolsUseCase,
-    RetrieveContextUseCase,
+)
+from dragula.composition import (
+    build_describe_symbol_use_case,
+    resolve_settings_and_repository,
 )
 from dragula.config import Settings
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(
@@ -27,14 +30,10 @@ def create_app(
     repository: SQLiteCodeDocumentRepository | None = None,
     describe_symbol: DescribeSymbolUseCase | None = None,
 ) -> FastAPI:
-    resolved_settings = settings
-    if resolved_settings is None:
-        from dragula.config import load_settings
-
-        resolved_settings = load_settings(project_root)
-
-    resolved_repository = repository or SQLiteCodeDocumentRepository(
-        resolved_settings.sqlite_path
+    resolved_settings, resolved_repository = resolve_settings_and_repository(
+        project_root,
+        settings=settings,
+        repository=repository,
     )
     list_symbols_use_case = ListSymbolsUseCase(resolved_repository)
     get_symbol_details = GetSymbolDetailsUseCase(resolved_repository)
@@ -44,15 +43,9 @@ def create_app(
     )
     resolved_describe_symbol = describe_symbol
     if resolved_describe_symbol is None:
-        llm_provider = build_llm_provider(resolved_settings)
-        vector_index = ChromaVectorIndexAdapter(resolved_settings.chroma_dir)
-        retriever = RetrieveContextUseCase(vector_index, llm_provider.embedding_client)
-        resolved_describe_symbol = DescribeSymbolUseCase(
-            symbol_reader=resolved_repository,
-            description_cache=resolved_repository,
-            retriever=retriever,
-            chat_client=llm_provider.chat_client,
-            top_k=resolved_settings.top_k,
+        resolved_describe_symbol = build_describe_symbol_use_case(
+            resolved_settings,
+            resolved_repository,
         )
 
     app = FastAPI(title="AI Code Docs")
@@ -84,13 +77,13 @@ def create_app(
     @app.post("/api/symbols/{symbol_id}/describe")
     def describe_symbol_route(symbol_id: str) -> dict[str, object]:
         try:
-            start = time.time()
             res = resolved_describe_symbol.generate_for_symbol(symbol_id)
-            end = time.time()
-            print(f"describe {symbol_id}: {end-start:.9f}")
             return _serialize(res)
         except ValueError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except Exception:
+            logger.exception("Failed to describe symbol %s", symbol_id)
+            raise
 
     @app.delete("/api/symbols/{symbol_id}/descriptions")
     def delete_symbol_descriptions(symbol_id: str) -> dict[str, object]:
