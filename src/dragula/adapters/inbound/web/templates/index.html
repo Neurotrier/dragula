@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Code Docs</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="app-body">
+  <div class="page-shell">
+    <header class="hero">
+      <div>
+        <p class="hero-kicker">Code intelligence workspace</p>
+        <h1>AI Code Docs</h1>
+        <p class="hero-subtitle">
+          Browse indexed objects, inspect source metadata, and generate AI-powered descriptions from one focused workspace.
+        </p>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel sidebar-panel" aria-labelledby="objectsHeading">
+        <div class="panel-header">
+          <div>
+            <p class="section-kicker">Explorer</p>
+            <h2 id="objectsHeading">Objects</h2>
+          </div>
+          <span id="symbolCount" class="count-pill">0</span>
+        </div>
+
+        <label class="search-field" for="symbolSearchInput">
+          <span class="search-label">Search objects</span>
+          <input id="symbolSearchInput" type="text" placeholder="Type a class, function, or module name">
+        </label>
+
+        <p id="symbolListStatus" class="panel-note" aria-live="polite">Loading indexed objects...</p>
+        <ul id="symbolList" class="symbol-list" aria-live="polite"></ul>
+      </section>
+
+      <section class="content-column">
+        <section class="panel details-panel" aria-labelledby="detailsHeading">
+          <div class="panel-header">
+            <div>
+              <p class="section-kicker">Inspector</p>
+              <h2 id="detailsHeading">Details</h2>
+            </div>
+          </div>
+
+          <div id="symbolDetails" class="details-card empty-state" aria-live="polite">
+            <p class="empty-title">Select an object</p>
+            <p class="empty-copy">Choose any item from the left sidebar to inspect its file, signature, and chunk metadata.</p>
+          </div>
+
+          <div class="actions">
+            <button id="describeBtn" class="button button-primary" type="button" disabled>Generate Description</button>
+            <button id="deleteDescriptionsBtn" class="button button-secondary button-danger" type="button" disabled>Delete Description</button>
+          </div>
+
+          <div id="descriptionLoading" class="loading-indicator hidden" role="status" aria-live="polite">
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Generating description...</span>
+          </div>
+
+          <p id="feedbackMessage" class="feedback-message hidden" aria-live="polite"></p>
+        </section>
+
+        <section class="panel result-panel" aria-labelledby="resultHeading">
+          <div class="panel-header">
+            <div>
+              <p class="section-kicker">Output</p>
+              <h2 id="resultHeading">AI Result</h2>
+            </div>
+          </div>
+          <pre id="aiResult" class="result-output empty-result">No AI output yet. Generate a description to see the response here.</pre>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

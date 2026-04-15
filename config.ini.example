@@ -1,0 +1,16 @@
+[app]
+top_k = 6
+
+[chat]
+provider = gemini
+model = gemini-2.5-flash
+api_key = ${GEMINI_API_KEY}
+base_url =
+timeout_seconds = 60
+
+[embedding]
+provider = gemini
+model = gemini-embedding-001
+api_key = ${GEMINI_API_KEY}
+base_url =
+timeout_seconds = 60
